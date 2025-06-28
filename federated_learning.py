@@ -2,12 +2,12 @@ import torch
 import numpy as np
 import copy
 from datetime import datetime
-from data_processor import DataProcessor
-from federated_model import FederatedModel
 from config import Config
 import os
 import json
 import matplotlib.pyplot as plt
+from data_processor import DataProcessor
+from federated_model import FederatedModel
 
 # FedAvg implementation simulating FedML framework
 class FedAvgServer:
