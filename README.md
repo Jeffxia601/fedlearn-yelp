@@ -25,7 +25,7 @@ This project tackles the challenges of training sentiment analysis models on dis
 1.  ​**Install Dependencies:​**​
 
     ```bash
-    pip install -r requirements.txt
+    pip install --user -r requirements.txt
     ```
 
 2.  ​**Choose Execution Mode:​**​
@@ -36,7 +36,7 @@ This project tackles the challenges of training sentiment analysis models on dis
         ```
     *   ​** GPU Mode (Full-Scale Training & Experiments):​**​
         1.  Edit `config.py` to switch modes:
-            ```bash
+            ```python
             USE_SMALL_SAMPLE = False
             BASE_MODEL = "microsoft/deberta-v3-base"
             ```
