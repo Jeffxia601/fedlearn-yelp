@@ -4,7 +4,6 @@ import torch
 from transformers import AutoTokenizer
 from datasets import load_dataset
 from config import Config
-import os
 
 class DataProcessor:
     def __init__(self):
@@ -13,34 +12,34 @@ class DataProcessor:
     def load_and_clean_data(self):
         """Load and clean Yelp dataset"""
         print("Downloading and processing Yelp dataset...")
-        
+
         # Load dataset from Hugging Face
-        try:
-            dataset = load_dataset('yelp_review_full')
-            train_data = dataset['train']
-            df = pd.DataFrame({
-                'text': train_data['text'], 
-                'stars': train_data['label'] + 1  # Convert labels to 1-5 stars
-            })
-            
-            # Use small samples for CPU mode
-            if Config.USE_SMALL_SAMPLE:
-                df = df.sample(min(2000, len(df)), random_state=Config.RANDOM_SEED)
-                print(f"Using small sample dataset: {len(df)} reviews")
-            else:
-                print(f"Using full dataset: {len(df)} reviews")
-                
-        except Exception as e:
-            print(f"Error loading dataset: {e}")
-            print("Using sample data instead")
-            return self._create_sample_data()
-        
-        # Data cleaning
-        df = self._clean_data(df)
-        
+        dataset = load_dataset('yelp_review_full')
+        print("Dataset keys:", dataset.keys())
+        train_data = dataset['train']
+        print("Train data type:", type(train_data))
+        print("Train data structure:", train_data)
+
+        # Convert to DataFrame
+        df = pd.DataFrame({
+            'text': train_data['text'],
+            'stars': np.array(train_data['label']) + 1  # Convert labels to 1-5 stars
+        })
+
+        # Use small samples for CPU mode
+        if Config.USE_SMALL_SAMPLE:
+            df = df.sample(min(2000, len(df)), random_state=Config.RANDOM_SEED)
+            print(f"Using small sample dataset: {len(df)} reviews")
+        else:
+            print(f"Using full dataset: {len(df)} reviews")
+
         # Sentiment labeling: 1=positive(4-5 stars), 0=negative(1-2 stars), skip 3 stars
         df = df[df['stars'] != 3]
         df['sentiment'] = (df['stars'] >= 4).astype(int)
+
+        # Data cleaning
+        df = self._clean_data(df)
+        self.validate_data(df)
         
         print(f"Final dataset size after cleaning: {len(df)}")
         print(f"Class distribution: \n{df['sentiment'].value_counts(normalize=True)}")
@@ -49,6 +48,7 @@ class DataProcessor:
 
     def _clean_data(self, df):
         """Data cleaning process"""
+        assert isinstance(df, pd.DataFrame), "Input is not a DataFrame at _clean_data()"
         print("Cleaning data...")
         # 1. Convert to lowercase
         df['text'] = df['text'].str.lower()
@@ -69,64 +69,67 @@ class DataProcessor:
             df = pd.concat([
                 pos.sample(min_samples, random_state=42),
                 neg.sample(min_samples, random_state=42)
-            ])
+            ], ignore_index=True)
         
         return df
-
-    def _create_sample_data(self):
-        """Create sample data (fallback when dataset loading fails)"""
-        print("Creating sample data...")
-        reviews = [
-            "Great food and excellent service!",
-            "Worst experience ever.",
-            "Average place, nothing special.",
-            "Highly recommended for family dinners.",
-            "Overpriced and low quality."
-        ]
-        ratings = [5, 1, 3, 4, 2]
-        return pd.DataFrame({"text": reviews, "stars": ratings})
+    
+    def validate_data(self, df):
+        """Check dataset integrity"""
+        required_columns = {'text', 'stars', 'sentiment'}
+        assert required_columns.issubset(df.columns), f"Missing columns: {required_columns - set(df.columns)}"
+        assert isinstance(df, pd.DataFrame), "Data is not a pandas DataFrame"
+        assert df['sentiment'].isin([0, 1]).all(), "Sentiment values must be binary (0/1)"
+        assert df['sentiment'].nunique() == 2, "Sentiment column should have exactly 2 classes"
 
     def prepare_non_iid_data(self, df):
         """Prepare Non-IID client datasets"""
+        assert isinstance(df, pd.DataFrame), "Input is not a DataFrame at prepare_non_iid_data()"
         print("Creating Non-IID client datasets...")
         num_clients = Config.NUM_CLIENTS
         
-        # Simulate business-specific data partitioning
-        unique_users = df.index.unique()
+        # If 'user_id' column present, group by user; else fallback
+        if 'user_id' in df.columns:
+            unique_users = df['user_id'].unique()
+            user_groups = df.groupby('user_id')['stars'].mean().reset_index()
+            user_groups = user_groups.sort_values('stars', ascending=False)
+            unique_users = user_groups['user_id'].tolist()
+        else:
+            unique_users = df.index.unique()
+
         if len(unique_users) < num_clients:
-            # Handle insufficient users by sentiment splitting
             return self._split_data_by_sentiment(df, num_clients)
-            
-        # Create non-IID distribution by user groups
-        client_datasets = []
+
+        unique_users = list(unique_users)
         np.random.shuffle(unique_users)
+
+        client_datasets = []
         users_per_client = len(unique_users) // num_clients
-        
+
         for i in range(num_clients):
             start_idx = i * users_per_client
             end_idx = (i + 1) * users_per_client
             user_group = unique_users[start_idx:end_idx]
             client_data = df[df.index.isin(user_group)]
             client_datasets.append(client_data)
-        
+
         return client_datasets
 
     def _split_data_by_sentiment(self, df, num_clients):
         """Split data by sentiment for Non-IID simulation"""
         print("Splitting data by sentiment...")
+
         positive_df = df[df['sentiment'] == 1]
         negative_df = df[df['sentiment'] == 0]
         
         client_datasets = []
         for i in range(num_clients):
-            # Create skewed distribution - simulating business-specific reviews
             if i % 2 == 0:
-                sample = positive_df.sample(frac=0.8, random_state=i)  # 80% positive
-                sample = sample.append(negative_df.sample(frac=0.2, random_state=i))  # 20% negative
+                sample_pos = positive_df.sample(frac=0.8, random_state=i)
+                sample_neg = negative_df.sample(frac=0.2, random_state=i)
             else:
-                sample = positive_df.sample(frac=0.2, random_state=i)  # 20% positive
-                sample = sample.append(negative_df.sample(frac=0.8, random_state=i))  # 80% negative
-                
+                sample_pos = positive_df.sample(frac=0.2, random_state=i)
+                sample_neg = negative_df.sample(frac=0.8, random_state=i)
+            sample = pd.concat([sample_pos, sample_neg], ignore_index=True)
             client_datasets.append(sample)
         
         return client_datasets
@@ -141,10 +144,10 @@ class DataProcessor:
             labels = df['sentiment'].tolist()
             
             encodings = self.tokenizer(
-                texts, 
-                padding=True, 
-                truncation=True, 
-                max_length=128, 
+                texts,
+                padding="max_length",
+                truncation=True,
+                max_length=128,
                 return_tensors="pt"
             )
             tokenized_datasets.append({
@@ -153,7 +156,6 @@ class DataProcessor:
                 'labels': torch.tensor(labels)
             })
             
-            print(f"Client {i+1}: {len(texts)} samples, "
-                  f"Positive ratio: {sum(labels)/len(labels):.2f}")
-        
+            print(f"Client {i+1}: {len(texts)} samples, Positive ratio: {sum(labels)/len(labels):.2f}")
+
         return tokenized_datasets

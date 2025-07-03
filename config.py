@@ -6,17 +6,19 @@ class Config:
     USE_SMALL_SAMPLE = True
     BASE_MODEL = "distilbert-base-uncased"
     LOCAL_EPOCHS = 2
+    BATCH_SIZE = 8
 
     # # For GPU training:
     # USE_SMALL_SAMPLE = False
     # BASE_MODEL = "microsoft/deberta-v3-base"
     # LOCAL_EPOCHS = 5
+    # BATCH_SIZE = 32
 
     # Experiment configuration
     NUM_CLIENTS = 10
-    NUM_ROUNDS = 20
+    NUM_ROUNDS = 2
     FRACTION = 0.4  # Fraction of clients participating each round
-    DP_ENABLED = True
+    DP_ENABLED = False
     RANDOM_SEED = 25
     
     # Privacy parameters
@@ -30,7 +32,7 @@ class Config:
     LORA_DROPOUT = 0.1
     
     # Training parameters
-    BATCH_SIZE = 16
+    # BATCH_SIZE = 16
     # LOCAL_EPOCHS = 2
     LOG_INTERVAL = 100
     

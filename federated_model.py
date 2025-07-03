@@ -94,9 +94,7 @@ class FederatedModel:
         
         try:
             # Initialize Opacus Privacy Engine
-            self.privacy_engine = PrivacyEngine(
-                torch.manual_seed(Config.RANDOM_SEED)
-            )
+            self.privacy_engine = PrivacyEngine()
             self.model, self.optimizer, data_loader = self.privacy_engine.make_private_with_epsilon(
                 module=self.model,
                 optimizer=self.optimizer,
@@ -157,13 +155,18 @@ class FederatedModel:
             epoch_loss = 0
             progress_bar = tqdm(train_loader, desc=f"Client {self.client_id} Epoch {epoch+1}")
             for batch_idx, batch in enumerate(progress_bar):
+                input_ids, attention_mask, labels = batch
+                if input_ids.numel() == 0:
+                    print(f"Skipping empty batch {batch_idx}")
+                    continue
                 inputs = {
-                    'input_ids': batch[0].to(self.device),
-                    'attention_mask': batch[1].to(self.device),
-                    'labels': batch[2].to(self.device)
+                    'input_ids': input_ids.to(self.device),
+                    'attention_mask': attention_mask.to(self.device),
+                    'labels': labels.to(self.device)
                 }
                 
                 self.optimizer.zero_grad()
+                print(f"[Client {self.client_id}] Batch {batch_idx} — input_ids: {inputs['input_ids'].shape}, "f"attention_mask: {inputs['attention_mask'].shape}")
                 outputs = self.model(**inputs)
                 loss = outputs.loss
                 loss.backward()
@@ -197,23 +200,25 @@ class FederatedModel:
 
     def log_training_stats(self, dataset_size, num_batches):
         """Log training statistics"""
+        # Convert all values to native Python types for JSON serialization
         stats = {
-            "client_id": self.client_id,
-            "training_time": self.training_time,
-            "samples_processed": dataset_size,
-            "batches_processed": num_batches * Config.LOCAL_EPOCHS,
-            "local_epochs": Config.LOCAL_EPOCHS,
+            "client_id": int(self.client_id),
+            "training_time": float(self.training_time),
+            "samples_processed": int(dataset_size),
+            "batches_processed": int(num_batches * Config.LOCAL_EPOCHS),
+            "local_epochs": int(Config.LOCAL_EPOCHS),
         }
-        
+
         if self.privacy_engine:
             stats.update({
-                "epsilon": self.epsilon,
-                "delta": Config.DELTA
+                "epsilon": float(self.epsilon),
+                "delta": float(Config.DELTA)
             })
-        
+
         log_path = os.path.join(Config.LOG_DIR, f"client_{self.client_id}_stats.json")
         with open(log_path, 'w') as f:
             json.dump(stats, f, indent=2)
+
 
     def evaluate(self, dataset):
         """Evaluate model performance"""
