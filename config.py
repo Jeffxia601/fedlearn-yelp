@@ -7,19 +7,21 @@ class Config:
     BASE_MODEL = "distilbert-base-uncased"
     LOCAL_EPOCHS = 2
     BATCH_SIZE = 8
+    NUM_ROUNDS = 2
 
     # # For GPU training:
     # USE_SMALL_SAMPLE = False
     # BASE_MODEL = "microsoft/deberta-v3-base"
     # LOCAL_EPOCHS = 5
     # BATCH_SIZE = 32
+    # NUM_ROUNDS = 20
 
     # Experiment configuration
     NUM_CLIENTS = 10
-    NUM_ROUNDS = 2
+    # NUM_ROUNDS = 20
     FRACTION = 0.4  # Fraction of clients participating each round
-    DP_ENABLED = False
-    RANDOM_SEED = 25
+    DP_ENABLED = True
+    RANDOM_SEED = 2025
     
     # Privacy parameters
     EPSILON = 1.0

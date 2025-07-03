@@ -94,7 +94,7 @@ class FederatedModel:
         
         try:
             # Initialize Opacus Privacy Engine
-            self.privacy_engine = PrivacyEngine()
+            self.privacy_engine = PrivacyEngine(secure_mode=True)
             self.model, self.optimizer, data_loader = self.privacy_engine.make_private_with_epsilon(
                 module=self.model,
                 optimizer=self.optimizer,
@@ -105,6 +105,7 @@ class FederatedModel:
                 max_grad_norm=Config.MAX_GRAD_NORM
             )
             
+            self.epsilon = self.privacy_engine.get_epsilon(Config.DELTA)
             print(f"Differential Privacy enabled - ε={self.epsilon:.2f}, δ={Config.DELTA}")
             return data_loader
         except Exception as e:
@@ -128,8 +129,7 @@ class FederatedModel:
         train_loader = DataLoader(
             dataset, 
             batch_size=Config.BATCH_SIZE, 
-            shuffle=True,
-            drop_last=True  # For DP compatibility
+            shuffle=True
         )
         
         # Optimizer and learning rate scheduler
