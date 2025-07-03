@@ -100,6 +100,7 @@ class FedAvgServer:
     
     def select_clients(self, total_clients, fraction):
         """Randomly select client subset"""
+        np.random.seed(Config.RANDOM_SEED)
         num_selected = max(int(fraction * total_clients), 1)
         return np.random.choice(range(total_clients), num_selected, replace=False)
     
@@ -160,11 +161,26 @@ class FedAvgServer:
         return avg_acc, avg_loss
 
     def save_results(self):
-        """Save training results"""
-        result_path = os.path.join(Config.LOG_DIR, "training_results.json")
-        with open(result_path, 'w') as f:
+        """Save training metrics and aggregated client statistics"""
+        # Save global training metrics
+        metrics_path = os.path.join(Config.LOG_DIR, "training_results.json")
+        with open(metrics_path, 'w') as f:
             json.dump(self.results, f, indent=2)
-        print(f"Saved results to {result_path}")
+        print(f"Global metrics saved to {metrics_path}")
+        
+        # Aggregate and save client statistics
+        client_stats = []
+        for client_id in range(Config.NUM_CLIENTS):
+            stats_path = os.path.join(Config.LOG_DIR, f"client_{client_id}_stats.json")
+            if os.path.exists(stats_path):
+                with open(stats_path, 'r') as f:
+                    client_stats.append(json.load(f))
+        
+        if client_stats:
+            aggregated_stats_path = os.path.join(Config.LOG_DIR, "all_client_stats.json")
+            with open(aggregated_stats_path, 'w') as f:
+                json.dump(client_stats, f, indent=2)
+            print(f"Aggregated client stats saved to {aggregated_stats_path}")
 
     def plot_training_progress(self):
         """Plot training progress"""

@@ -25,7 +25,7 @@ class DataProcessor:
             
             # Use small samples for CPU mode
             if Config.USE_SMALL_SAMPLE:
-                df = df.sample(min(2000, len(df)), random_state=42)
+                df = df.sample(min(2000, len(df)), random_state=Config.RANDOM_SEED)
                 print(f"Using small sample dataset: {len(df)} reviews")
             else:
                 print(f"Using full dataset: {len(df)} reviews")
@@ -136,6 +136,7 @@ class DataProcessor:
         print("Tokenizing datasets...")
         tokenized_datasets = []
         for i, df in enumerate(datasets):
+            np.random.seed(Config.RANDOM_SEED)
             texts = df['text'].tolist()
             labels = df['sentiment'].tolist()
             

@@ -1,8 +1,10 @@
-# requirements.txt for Python 3.12
-torch==2.2.2
-transformers==4.36.2
-datasets==2.16.1
-tqdm==4.66.4
-opacus==1.5.0
-peft==0.7.1
-tokenizers==0.15.2
+# requirements.txt for Python 3.11
+torch
+transformers
+datasets
+huggingface_hub[hf_xet]
+tqdm
+opacus
+peft
+tokenizers
+matplotlib

@@ -5,26 +5,24 @@ class Config:
     # For CPU testing:
     USE_SMALL_SAMPLE = True
     BASE_MODEL = "distilbert-base-uncased"
+    LOCAL_EPOCHS = 2
 
     # # For GPU training:
     # USE_SMALL_SAMPLE = False
     # BASE_MODEL = "microsoft/deberta-v3-base"
+    # LOCAL_EPOCHS = 5
 
     # Experiment configuration
     NUM_CLIENTS = 10
     NUM_ROUNDS = 20
     FRACTION = 0.4  # Fraction of clients participating each round
     DP_ENABLED = True
-    # USE_SMALL_SAMPLE = True  # Use small samples for CPU mode
+    RANDOM_SEED = 25
     
     # Privacy parameters
     EPSILON = 1.0
     DELTA = 1e-5
     MAX_GRAD_NORM = 1.0
-    
-    # Model selection
-    # BASE_MODEL = "distilbert-base-uncased"  # Small model for CPU mode
-    # BASE_MODEL = "microsoft/deberta-v3-base"  # For GPU mode
     
     # LoRA configuration
     LORA_R = 8
@@ -33,8 +31,8 @@ class Config:
     
     # Training parameters
     BATCH_SIZE = 16
-    LOCAL_EPOCHS = 2
-    LOG_INTERVAL = 50
+    # LOCAL_EPOCHS = 2
+    LOG_INTERVAL = 100
     
     # Paths
     DATA_DIR = "./yelp_data"
