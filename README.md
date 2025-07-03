@@ -32,12 +32,11 @@ This project tackles the challenges of training sentiment analysis models on dis
 
     *   ​** CPU Mode (Small-Scale Testing & Debugging):​**​
         ```bash
-        python federated_learning.py  # Runs with default small sample & model
+        python federated_learning.py
         ```
     *   ​** GPU Mode (Full-Scale Training & Experiments):​**​
         1.  Edit `config.py` to switch modes:
             ```python
-            # FOR GPU TRAINING (Full-scale):
             USE_SMALL_SAMPLE = False
             BASE_MODEL = "microsoft/deberta-v3-base"
             ```
