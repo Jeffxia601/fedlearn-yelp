@@ -22,23 +22,26 @@ This project tackles the challenges of training sentiment analysis models on dis
 
 ## Getting Started (Quick Setup)
 
-1.  ​**Install Dependencies:​**​
-
-    ```bash
-    pip install --user -r requirements.txt
-    ```
-
-2.  ​**Choose Execution Mode:​**​
+1.  ​**Choose Execution Mode:​**​
 
     *   ​** CPU Mode (Small-Scale Testing & Debugging):​**​
         ```bash
+        pip install --user -r requirements-cpu.txt
         python federated_learning.py
         ```
     *   ​** GPU Mode (Full-Scale Training & Experiments):​**​
-        1.  Edit `config.py` to switch modes:
-            ```python
+        1.  Install dependencies:
+            ```bash
+            pip install --user -r requirements-gpu.txt
+            ```
+        2.  Edit `config.py` to switch modes
+            ```bash
+            # For GPU training:
             USE_SMALL_SAMPLE = False
             BASE_MODEL = "microsoft/deberta-v3-base"
+            LOCAL_EPOCHS = 5
+            BATCH_SIZE = 32
+            NUM_ROUNDS = 20
             ```
         2.  Run the federated learning process:
             ```bash
