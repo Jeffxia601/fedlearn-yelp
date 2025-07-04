@@ -106,30 +106,33 @@ class FedAvgServer:
     
     def aggregate_updates(self, client_updates, total_samples):
         """FedAvg aggregation algorithm"""
+        device = next(self.global_model.model.parameters()).device
+
         # Initialize average parameters
-        avg_state = {}
-        for name, param in self.global_model.model.named_parameters():
-            if 'lora' in name:  # Only aggregate LoRA parameters
-                avg_state[name] = torch.zeros_like(param.data)
-        
+        avg_state = {
+            name: torch.zeros_like(param.data, device=device)
+            for name, param in self.global_model.model.named_parameters()
+            if 'lora' in name
+        }
+
         # Weighted average
         for client_id, update in client_updates:
-            client_samples = len(update)  # Approximate size
+            client_samples = len(update)
             weight = client_samples / total_samples
-            
+
             for name, param in update.items():
                 if name in avg_state:
-                    avg_state[name] += param * weight
+                    avg_state[name] += param.to(device) * weight
         
         # Create new state dictionary
         new_state = copy.deepcopy(self.global_model.model.state_dict())
         for name, value in avg_state.items():
             if name in new_state:
-                new_state[name] = value.to(new_state[name].device)
-        
+                new_state[name] = value
+
         # Update global model
         self.global_model.model.load_state_dict(new_state)
-        
+    
         print("Global model updated")
     
     def evaluate_global_model(self, test_datasets, round_idx):
