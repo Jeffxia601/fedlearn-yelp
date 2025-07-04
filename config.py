@@ -2,19 +2,19 @@ import os
 
 class Config:
 
-    # For CPU testing:
-    USE_SMALL_SAMPLE = True
-    BASE_MODEL = "distilbert-base-uncased"
-    LOCAL_EPOCHS = 2
-    BATCH_SIZE = 8
-    NUM_ROUNDS = 2
+    # # For CPU testing:
+    # USE_SMALL_SAMPLE = True
+    # BASE_MODEL = "distilbert-base-uncased"
+    # LOCAL_EPOCHS = 2
+    # BATCH_SIZE = 8
+    # NUM_ROUNDS = 2
 
-    # # For GPU training:
-    # USE_SMALL_SAMPLE = False
-    # BASE_MODEL = "microsoft/deberta-v3-base"
-    # LOCAL_EPOCHS = 5
-    # BATCH_SIZE = 32
-    # NUM_ROUNDS = 20
+    # For GPU training:
+    USE_SMALL_SAMPLE = False
+    BASE_MODEL = "microsoft/deberta-v3-base"
+    LOCAL_EPOCHS = 2 # 5
+    BATCH_SIZE = 32
+    NUM_ROUNDS = 2 # 20
 
     # Experiment configuration
     NUM_CLIENTS = 10
