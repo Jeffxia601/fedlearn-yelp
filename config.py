@@ -10,9 +10,9 @@ class Config:
     # For GPU or CPU training:
     USE_SMALL_SAMPLE = (DEVICE.type == "cpu")
     BASE_MODEL = "microsoft/deberta-v3-base" if DEVICE.type == "cuda" else "distilbert-base-uncased"
-    LOCAL_EPOCHS = 2 if DEVICE.type == "cuda" else 2
+    LOCAL_EPOCHS = 4 if DEVICE.type == "cuda" else 2
     BATCH_SIZE = 32 if DEVICE.type == "cuda" else 8
-    NUM_ROUNDS = 2 if DEVICE.type == "cuda" else 2
+    NUM_ROUNDS = 8 if DEVICE.type == "cuda" else 2
 
     # Experiment configuration
     NUM_CLIENTS = 10
