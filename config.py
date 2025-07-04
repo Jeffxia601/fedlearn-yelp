@@ -34,13 +34,12 @@ class Config:
     LOG_INTERVAL = 100
     
     # Paths
-    DATA_DIR = Path("./yelp_data")
     LOG_DIR  = Path("./logs")
     SAVE_DIR = Path("./models")
     
     @classmethod
     def setup_dirs(cls):
-        for d in (cls.DATA_DIR, cls.LOG_DIR, cls.SAVE_DIR):
+        for d in (cls.LOG_DIR, cls.SAVE_DIR):
             d.mkdir(parents=True, exist_ok=True)
 
 # Initialize directories
