@@ -9,9 +9,9 @@ This project tackles the challenges of training sentiment analysis models on dis
 
 | ​**Area**​                            | ​**Technique & Implementation**​             | ​**Achieved Outcome**​                                                                  |
 | :---------------------------------- | :----------------------------------------- | :------------------------------------------------------------------------------------ |
-| ​** Efficiency Optimization**​       | ​**LoRA-based Fine-tuning**​ of `DeBERTa-v3-base` | ​**​<1%​**​ Parameter Updates <br> ​**~40%↓**​ Communication Overhead                 |
-| ​** Rigorous Privacy Protection**​  | Client-side ​**Local Differential Privacy (LDP)​**​ via `Opacus` <br> (Gradient Clipping + Noise Injection @ `ε=1.0, δ=1e⁻⁵`) | Strong Privacy Guarantees <br> Controlled Utility Impact: ​**~3%↓**​ Accuracy (Avg. 86% → 83%) |
-| ​** System Implementation & Non-IID Analysis**​ | FedML-based ​**10-node FL System**​ <br> Integrated Pipeline: Data Cleaning → Sentiment Labeling → FedAvg <br> Extensive testing under `ε ∈ [0.1, 5.0]` | ​**Real-world Non-IID Handling**​ <br> ​**~110%↑**​ Convergence Rounds (vs. IID Baseline) <br> Identified ​**Accelerated Accuracy Drop**​ trend at `ε>2.0` |
+| ​**Efficiency Optimization**​       | ​**LoRA-based Fine-tuning**​ of `DeBERTa-v3-base` | ​**​<1%​**​ Parameter Updates <br> ​**~40%↓**​ Communication Overhead                 |
+| ​**Rigorous Privacy Protection**​  | Client-side ​**Local Differential Privacy (LDP)​**​ via `Opacus` <br> (Gradient Clipping + Noise Injection @ `ε=1.0, δ=1e⁻⁵`) | Strong Privacy Guarantees <br> Controlled Utility Impact: ​**~3%↓**​ Accuracy (Avg. 86% → 83%) |
+| ​**System Implementation & Non-IID Analysis**​ | FedML-based ​**10-node FL System**​ <br> Integrated Pipeline: Data Cleaning → Sentiment Labeling → FedAvg <br> Extensive testing under `ε ∈ [0.1, 5.0]` | ​**Real-world Non-IID Handling**​ <br> ​**~110%↑**​ Convergence Rounds (vs. IID Baseline) <br> Identified ​**Accelerated Accuracy Drop**​ trend at `ε>2.0` |
 
 ## Technical Implementation Highlights
 
