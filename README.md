@@ -24,7 +24,7 @@ This project tackles the challenges of training sentiment analysis models on dis
 
 1.  ​**Choose Execution Mode:​**​
 
-    *   ​** CPU Mode (Small-Scale Testing & Debugging):​**​
+    *   ​**CPU Mode (Small-Scale Testing & Debugging):​**​
         1.  Install dependencies:
             ```bash
             pip install --user -r requirements-cpu.txt
@@ -38,7 +38,7 @@ This project tackles the challenges of training sentiment analysis models on dis
             ```bash
             python federated_learning.py
             ```
-    *   ​** GPU Mode (Full-Scale Training & Experiments):​**​
+    *   ​**GPU Mode (Full-Scale Training & Experiments):​**​
         1.  Install dependencies:
             ```bash
             pip install --user -r requirements-gpu.txt
@@ -53,4 +53,4 @@ This project tackles the challenges of training sentiment analysis models on dis
             python federated_learning.py
             ```
 
-3.  ​** Results & Visualization:​**​ Training performance plots are generated automatically during execution.
+3.  ​**Results & Visualization:​**​ Training performance plots are generated automatically during execution.
